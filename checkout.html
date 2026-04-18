@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure checkout — pūra.baby organic baby skincare">
+  <title>Checkout — pūra.baby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --cream:#FBF7F0;--sage:#6B8F71;--sage-light:#A8C5A0;--sage-dark:#3D5C42;
+      --terra:#C4724A;--terra-light:#E8A882;--forest:#1E3A2F;
+      --warm-white:#FFFDF9;--muted:#8B7355;--border:#E8DDD0;--border2:#D4C9B8;
+      --ff-d:'Cormorant Garamond',serif;--ff-b:'DM Sans',sans-serif;
+    }
+    body{font-family:var(--ff-b);background:var(--cream);color:var(--forest);min-height:100vh;font-size:15px;line-height:1.6}
+    /* NAV */
+    nav{background:rgba(251,247,240,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5vw;position:sticky;top:0;z-index:100}
+    .nav-i{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:var(--ff-d);font-size:1.5rem;font-weight:500;color:var(--forest);text-decoration:none}
+    .logo span{color:var(--sage)}
+    .secure-badge{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--sage-dark);background:rgba(107,143,113,.1);padding:.3rem .8rem;border-radius:2rem}
+    /* PROGRESS */
+    .progress{background:var(--warm-white);border-bottom:1px solid var(--border);padding:1rem 5vw}
+    .progress-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+    .step{display:flex;align-items:center;gap:.6rem;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .step.active{color:var(--forest);font-weight:500}
+    .step.done{color:var(--sage-dark)}
+    .step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;flex-shrink:0}
+    .step.active .step-num{border-color:var(--forest);background:var(--forest);color:var(--cream)}
+    .step.done .step-num{border-color:var(--sage);background:var(--sage);color:white}
+    .step-line{width:60px;height:1px;background:var(--border);margin:0 .8rem}
+    .step-line.done{background:var(--sage)}
+    /* LAYOUT */
+    .checkout-layout{max-width:1200px;margin:0 auto;padding:3rem 5vw 6rem;display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start}
+    /* FORM SECTIONS */
+    .form-section{background:var(--warm-white);border:1px solid var(--border);border-radius:20px;padding:1.8rem;margin-bottom:1.2rem;animation:fadeUp .3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .form-section:nth-child(2){animation-delay:.07s}
+    .form-section:nth-child(3){animation-delay:.14s}
+    .form-section:nth-child(4){animation-delay:.21s}
+    .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem}
+    .section-hdr h3{font-family:var(--ff-d);font-size:1.2rem;font-weight:400;color:var(--forest);display:flex;align-items:center;gap:.6rem}
+    .section-icon{font-size:1rem}
+    .section-edit{font-size:.75rem;color:var(--sage-dark);cursor:pointer;text-decoration:underline}
+    /* FORM FIELDS */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+    .form-row.full{grid-template-columns:1fr}
+    .form-row.three{grid-template-columns:1fr 1fr 1fr}
+    .field{display:flex;flex-direction:column;gap:.4rem}
+    .field label{font-size:.73rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+    .field input,.field select,.field textarea{
+      border:1.5px solid var(--border);border-radius:10px;padding:.65rem .9rem;
+      font-family:var(--ff-b);font-size:.88rem;color:var(--forest);
+      background:var(--cream);outline:none;transition:border-color .18s;
+      appearance:none;-webkit-appearance:none;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sage)}
+    .field input.error{border-color:var(--terra)}
+    .field textarea{resize:vertical;min-height:70px}
+    .field-hint{font-size:.7rem;color:var(--muted)}
+    .field-error{font-size:.7rem;color:var(--terra);display:none}
+    .field input.error + .field-error{display:block}
+    /* RADIO CARDS */
+    .radio-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    .radio-card{border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem;cursor:pointer;transition:all .18s;position:relative}
+    .radio-card.selected{border-color:var(--forest);background:rgba(30,58,47,.03)}
+    .radio-card:hover:not(.selected){border-color:var(--border2)}
+    .radio-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+    .rc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem}
+    .rc-name{font-size:.88rem;font-weight:500;color:var(--forest);display:flex;align-items:center;gap:.5rem}
+    .rc-icon{font-size:1rem}
+    .rc-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+    .radio-card.selected .rc-check{background:var(--forest);border-color:var(--forest)}
+    .rc-check::after{content:'✓';font-size:.65rem;color:white;display:none}
+    .radio-card.selected .rc-check::after{display:block}
+    .rc-desc{font-size:.75rem;color:var(--muted);line-height:1.45}
+    .rc-badge{font-size:.65rem;background:rgba(107,143,113,.12);color:var(--sage-dark);padding:.1rem .5rem;border-radius:2rem;font-weight:500}
+    /* PAYMENT METHODS */
+    .pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.2rem}
+    .pay-btn{border:1.5px solid var(--border);border-radius:10px;padding:.7rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.3rem;transition:all .18s;background:transparent}
+    .pay-btn.selected{border-color:var(--forest);background:rgba(30,58,47,.03)}
+    .pay-btn:hover:not(.selected){border-color:var(--border2)}
+    .pay-icon{font-size:1.4rem}
+    .pay-label{font-size:.7rem;color:var(--muted);font-weight:500}
+    .pay-btn.selected .pay-label{color:var(--forest)}
+    /* CARD FIELDS */
+    .card-fields{display:none;margin-top:1rem}
+    .card-fields.visible{display:block;animation:fadeUp .25s ease}
+    .card-number-wrap{position:relative}
+    .card-number-wrap input{padding-right:3rem}
+    .card-type-icon{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none}
+    /* UPI FIELD */
+    .upi-field{display:none;margin-top:1rem}
+    .upi-field.visible{display:block;animation:fadeUp .25s ease}
+    .upi-apps{display:flex;gap:.6rem;margin-bottom:.8rem}
+    .upi-app{border:1px solid var(--border);border-radius:8px;padding:.4rem .7rem;font-size:.72rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.3rem}
+    .upi-app:hover{border-color:var(--sage)}
+    /* ORDER ITEMS IN SUMMARY */
+    .summary-card{background:var(--warm-white);border:1px solid var(--border);border-radius:20px;padding:1.8rem;position:sticky;top:90px}
+    .summary-title{font-family:var(--ff-d);font-size:1.3rem;font-weight:400;color:var(--forest);margin-bottom:1.2rem;padding-bottom:.9rem;border-bottom:1px solid var(--border)}
+    .summary-items{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border)}
+    .s-item{display:flex;align-items:center;gap:.9rem}
+    .s-item-img{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;position:relative}
+    .s-item-img.bg1{background:rgba(168,197,160,.2)}
+    .s-item-img.bg2{background:rgba(232,168,130,.15)}
+    .s-qty{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--forest);color:white;border-radius:50%;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:500}
+    .s-item-info{flex:1}
+    .s-item-name{font-size:.82rem;font-weight:500;color:var(--forest)}
+    .s-item-var{font-size:.72rem;color:var(--muted)}
+    .s-item-price{font-size:.85rem;font-weight:500;color:var(--forest)}
+    .summary-rows{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem}
+    .summary-row{display:flex;justify-content:space-between;font-size:.83rem}
+    .summary-row .lbl{color:var(--muted)}
+    .summary-row .val{color:var(--forest);font-weight:500}
+    .summary-row.saving .val{color:var(--sage-dark)}
+    hr.sdiv{border:none;border-top:1px solid var(--border);margin:.8rem 0}
+    .summary-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem}
+    .summary-total .lbl{font-size:1rem;font-weight:500}
+    .summary-total .val{font-family:var(--ff-d);font-size:1.8rem;font-weight:400}
+    .btn-place{width:100%;background:var(--forest);color:var(--cream);border:none;height:54px;border-radius:2rem;font-family:var(--ff-b);font-size:.95rem;letter-spacing:.04em;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;gap:.5rem;font-weight:500;margin-bottom:.8rem}
+    .btn-place:hover{background:var(--sage-dark);transform:translateY(-1px)}
+    .btn-place:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .ssl-note{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:.72rem;color:var(--muted);margin-bottom:1.2rem}
+    .summary-trust{display:flex;flex-direction:column;gap:.45rem;padding-top:1rem;border-top:1px solid var(--border)}
+    .trust-line{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--muted)}
+    /* SUCCESS OVERLAY */
+    .success-overlay{position:fixed;inset:0;background:rgba(251,247,240,.97);z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem}
+    .success-overlay.show{display:flex;animation:fadeUp .5s ease}
+    .success-icon{font-size:5rem;margin-bottom:1.5rem;animation:bounce .6s ease .3s both}
+    @keyframes bounce{0%{transform:scale(0)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+    .success-overlay h2{font-family:var(--ff-d);font-size:2.5rem;font-weight:400;color:var(--forest);margin-bottom:.6rem}
+    .success-overlay h2 em{font-style:italic;color:var(--terra)}
+    .success-overlay p{font-size:.9rem;color:var(--muted);max-width:420px;line-height:1.7;margin-bottom:.4rem;font-weight:300}
+    .order-num{font-size:.8rem;color:var(--sage-dark);background:rgba(107,143,113,.1);padding:.4rem 1rem;border-radius:2rem;display:inline-block;margin:1rem 0 1.5rem}
+    .success-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+    .btn-home{background:var(--forest);color:var(--cream);padding:.8rem 2rem;border-radius:2rem;text-decoration:none;font-size:.88rem;transition:background .2s}
+    .btn-home:hover{background:var(--sage-dark)}
+    .btn-track{border:1.5px solid var(--forest);color:var(--forest);padding:.8rem 2rem;border-radius:2rem;text-decoration:none;font-size:.88rem;transition:all .2s}
+    .btn-track:hover{background:var(--forest);color:var(--cream)}
+    /* RESPONSIVE */
+    @media(max-width:800px){
+      .checkout-layout{grid-template-columns:1fr}
+      .summary-card{position:static}
+      .form-row{grid-template-columns:1fr}
+      .form-row.three{grid-template-columns:1fr 1fr}
+      .radio-grid{grid-template-columns:1fr}
+      .pay-grid{grid-template-columns:repeat(3,1fr)}
+      .step-line{width:30px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-i">
+    <a href="index.html" class="logo">pūra<span>.</span>baby</a>
+    <div class="secure-badge">🔒 Secure checkout</div>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress">
+  <div class="progress-inner">
+    <div class="step done"><div class="step-num">1</div><span>Cart</span></div>
+    <div class="step-line done"></div>
+    <div class="step active"><div class="step-num">2</div><span>Checkout</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">3</div><span>Confirmation</span></div>
+  </div>
+</div>
+
+<div class="checkout-layout">
+
+  <!-- LEFT: FORM -->
+  <div>
+
+    <!-- CONTACT -->
+    <div class="form-section">
+      <div class="section-hdr">
+        <h3><span class="section-icon">👤</span> Contact details</h3>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>First name</label>
+          <input type="text" id="fname" placeholder="Nikunj">
+          <span class="field-error">Please enter your first name</span>
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" id="lname" placeholder="Lahoti">
+          <span class="field-error">Please enter your last name</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Mobile number</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" maxlength="14">
+          <span class="field-error">Enter a valid 10-digit number</span>
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <input type="email" id="email" placeholder="you@email.com">
+          <span class="field-error">Enter a valid email address</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY ADDRESS -->
+    <div class="form-section" style="animation-delay:.07s">
+      <div class="section-hdr">
+        <h3><span class="section-icon">📍</span> Delivery address</h3>
+      </div>
+      <div class="form-row full">
+        <div class="field">
+          <label>Address line 1</label>
+          <input type="text" id="addr1" placeholder="Flat / House no., Building name">
+          <span class="field-error">Please enter your address</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field">
+          <label>Address line 2 <span style="opacity:.5;font-size:.65rem">(optional)</span></label>
+          <input type="text" id="addr2" placeholder="Street, Area, Landmark">
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="city" placeholder="Bengaluru">
+          <span class="field-error">Required</span>
+        </div>
+        <div class="field">
+          <label>State</label>
+          <select id="state">
+            <option value="">Select state</option>
+            <option>Karnataka</option><option>Maharashtra</option><option>Delhi</option>
+            <option>Tamil Nadu</option><option>Telangana</option><option>Kerala</option>
+            <option>Gujarat</option><option>Rajasthan</option><option>West Bengal</option>
+            <option>Uttar Pradesh</option><option>Punjab</option><option>Haryana</option>
+          </select>
+          <span class="field-error">Required</span>
+        </div>
+        <div class="field">
+          <label>Pincode</label>
+          <input type="text" id="pincode" placeholder="560001" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'');checkPincode(this.value)">
+          <span class="field-hint" id="pin-hint"></span>
+          <span class="field-error">Enter valid 6-digit pincode</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field">
+          <label>Delivery instructions <span style="opacity:.5;font-size:.65rem">(optional)</span></label>
+          <textarea id="notes" placeholder="E.g. Leave at door, call before delivery…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY METHOD -->
+    <div class="form-section" style="animation-delay:.14s">
+      <div class="section-hdr">
+        <h3><span class="section-icon">🚚</span> Delivery method</h3>
+      </div>
+      <div class="radio-grid">
+        <div class="radio-card selected" onclick="selectDelivery(this,'standard')">
+          <input type="radio" name="delivery" value="standard" checked>
+          <div class="rc-header">
+            <div class="rc-name"><span class="rc-icon">📦</span> Standard</div>
+            <div class="rc-check"></div>
+          </div>
+          <div class="rc-desc">Delivered in 3–5 business days · <strong>FREE</strong></div>
+        </div>
+        <div class="radio-card" onclick="selectDelivery(this,'express')">
+          <input type="radio" name="delivery" value="express">
+          <div class="rc-header">
+            <div class="rc-name"><span class="rc-icon">⚡</span> Express <span class="rc-badge">+₹79</span></div>
+            <div class="rc-check"></div>
+          </div>
+          <div class="rc-desc">Delivered tomorrow by 9 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="form-section" style="animation-delay:.21s">
+      <div class="section-hdr">
+        <h3><span class="section-icon">💳</span> Payment method</h3>
+      </div>
+      <div class="pay-grid">
+        <button class="pay-btn selected" onclick="selectPay(this,'upi')">
+          <span class="pay-icon">📱</span>
+          <span class="pay-label">UPI</span>
+        </button>
+        <button class="pay-btn" onclick="selectPay(this,'card')">
+          <span class="pay-icon">💳</span>
+          <span class="pay-label">Card</span>
+        </button>
+        <button class="pay-btn" onclick="selectPay(this,'cod')">
+          <span class="pay-icon">💵</span>
+          <span class="pay-label">Cash on delivery</span>
+        </button>
+      </div>
+
+      <!-- UPI -->
+      <div class="upi-field visible" id="upi-field">
+        <div class="upi-apps">
+          <div class="upi-app" onclick="fillUpi(this,'gpay')">🟢 GPay</div>
+          <div class="upi-app" onclick="fillUpi(this,'phonepe')">💜 PhonePe</div>
+          <div class="upi-app" onclick="fillUpi(this,'paytm')">🔵 Paytm</div>
+          <div class="upi-app" onclick="fillUpi(this,'bhim')">🇮🇳 BHIM</div>
+        </div>
+        <div class="field">
+          <label>UPI ID</label>
+          <input type="text" id="upi-id" placeholder="yourname@upi">
+          <span class="field-hint">e.g. nikunj@okhdfcbank</span>
+        </div>
+      </div>
+
+      <!-- CARD -->
+      <div class="card-fields" id="card-fields">
+        <div class="form-row full" style="margin-bottom:.8rem">
+          <div class="field">
+            <label>Card number</label>
+            <div class="card-number-wrap">
+              <input type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+              <span class="card-type-icon" id="card-icon">💳</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Expiry date</label>
+            <input type="text" id="card-exp" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)">
+          </div>
+          <div class="field">
+            <label>CVV</label>
+            <input type="password" id="card-cvv" placeholder="•••" maxlength="4">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Cardholder name</label>
+            <input type="text" id="card-name" placeholder="Name as on card">
+          </div>
+        </div>
+      </div>
+
+      <!-- COD -->
+      <div id="cod-field" style="display:none;margin-top:1rem;background:rgba(232,168,130,.08);border:1px solid rgba(196,114,74,.2);border-radius:10px;padding:.9rem 1.1rem">
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.6">💵 Pay in cash when your order is delivered. Please keep exact change ready. A ₹39 handling fee applies for COD orders.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: ORDER SUMMARY -->
+  <div>
+    <div class="summary-card">
+      <div class="summary-title">Order summary</div>
+
+      <div class="summary-items">
+        <div class="s-item">
+          <div class="s-item-img bg1">🌼<span class="s-qty">2</span></div>
+          <div class="s-item-info">
+            <div class="s-item-name">Calendula Gentle Wash</div>
+            <div class="s-item-var">200ml · Calendula & Oat</div>
+          </div>
+          <div class="s-item-price">₹ 898</div>
+        </div>
+        <div class="s-item">
+          <div class="s-item-img bg2">🌱<span class="s-qty">1</span></div>
+          <div class="s-item-info">
+            <div class="s-item-name">Moringa Daily Lotion</div>
+            <div class="s-item-var">200ml · Original</div>
+          </div>
+          <div class="s-item-price">₹ 549</div>
+        </div>
+      </div>
+
+      <div class="summary-rows">
+        <div class="summary-row"><span class="lbl">Subtotal</span><span class="val">₹ 1,447</span></div>
+        <div class="summary-row saving"><span class="lbl">Discount</span><span class="val">− ₹ 300</span></div>
+        <div class="summary-row saving"><span class="lbl">Coupon (PURA10)</span><span class="val" id="coupon-display">—</span></div>
+        <div class="summary-row"><span class="lbl">Delivery</span><span class="val" id="delivery-display" style="color:var(--sage-dark)">FREE</span></div>
+        <div class="summary-row"><span class="lbl">GST (18%)</span><span class="val">₹ 207</span></div>
+      </div>
+
+      <hr class="sdiv">
+      <div class="summary-total">
+        <span class="lbl">Total</span>
+        <span class="val" id="grand-total">₹ 1,354</span>
+      </div>
+
+      <div class="ssl-note">🔒 256-bit SSL encryption · Secured by Razorpay</div>
+
+      <button class="btn-place" id="place-btn" onclick="placeOrder()">
+        <span id="place-text">Place order · ₹ 1,354</span>
+      </button>
+
+      <div class="summary-trust">
+        <div class="trust-line"><span>🌿</span> 100% organic · COSMOS certified</div>
+        <div class="trust-line"><span>↩️</span> 30-day hassle-free returns</div>
+        <div class="trust-line"><span>📞</span> Support: hello@purababy.in</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-icon">🌿</div>
+  <h2>Order placed, <em>thank you!</em></h2>
+  <p>Your pūra.baby order is confirmed and will be packed with love. You'll receive a tracking link on your phone and email shortly.</p>
+  <div class="order-num">Order #PB-2025-08847</div>
+  <p style="font-size:.8rem;color:var(--muted)">Estimated delivery: <strong style="color:var(--forest)">Tuesday, 22 April</strong></p>
+  <div class="success-actions" style="margin-top:1.5rem">
+    <a href="index.html" class="btn-home">Back to home</a>
+    <a href="#" class="btn-track">Track order</a>
+  </div>
+</div>
+
+<script>
+  // Delivery selection
+  function selectDelivery(card, type) {
+    document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    const total = document.getElementById('grand-total');
+    const delivDisplay = document.getElementById('delivery-display');
+    const placeText = document.getElementById('place-text');
+    if (type === 'express') {
+      delivDisplay.textContent = '₹ 79';
+      delivDisplay.style.color = 'var(--forest)';
+      total.textContent = '₹ 1,433';
+      placeText.textContent = 'Place order · ₹ 1,433';
+    } else {
+      delivDisplay.textContent = 'FREE';
+      delivDisplay.style.color = 'var(--sage-dark)';
+      total.textContent = '₹ 1,354';
+      placeText.textContent = 'Place order · ₹ 1,354';
+    }
+  }
+
+  // Payment selection
+  let currentPay = 'upi';
+  function selectPay(btn, type) {
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentPay = type;
+    document.getElementById('upi-field').className = 'upi-field' + (type === 'upi' ? ' visible' : '');
+    document.getElementById('card-fields').className = 'card-fields' + (type === 'card' ? ' visible' : '');
+    document.getElementById('cod-field').style.display = type === 'cod' ? 'block' : 'none';
+  }
+
+  // UPI app fill
+  function fillUpi(el, app) {
+    document.querySelectorAll('.upi-app').forEach(a => a.style.borderColor = '');
+    el.style.borderColor = 'var(--sage)';
+    const map = {gpay:'@okicici', phonepe:'@ybl', paytm:'@paytm', bhim:'@upi'};
+    const inp = document.getElementById('upi-id');
+    if (!inp.value) inp.value = 'yourname' + (map[app] || '@upi');
+  }
+
+  // Card formatting
+  function formatCard(inp) {
+    let v = inp.value.replace(/\D/g,'').substring(0,16);
+    inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+    const icon = document.getElementById('card-icon');
+    if (v.startsWith('4')) icon.textContent = '💳';
+    else if (v.startsWith('5')) icon.textContent = '🟠';
+    else if (v.startsWith('3')) icon.textContent = '🟦';
+    else icon.textContent = '💳';
+  }
+  function formatExpiry(inp) {
+    let v = inp.value.replace(/\D/g,'');
+    if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2,4);
+    inp.value = v;
+  }
+
+  // Pincode check
+  function checkPincode(val) {
+    const hint = document.getElementById('pin-hint');
+    if (val.length === 6) {
+      hint.textContent = '✓ Serviceable — delivery in 3–5 days';
+      hint.style.color = 'var(--sage-dark)';
+    } else {
+      hint.textContent = '';
+    }
+  }
+
+  // Validate
+  function validate() {
+    let ok = true;
+    const required = [
+      {id:'fname', check: v => v.length > 1},
+      {id:'lname', check: v => v.length > 1},
+      {id:'phone', check: v => v.replace(/\D/g,'').length >= 10},
+      {id:'email', check: v => v.includes('@') && v.includes('.')},
+      {id:'addr1', check: v => v.length > 3},
+      {id:'city',  check: v => v.length > 1},
+      {id:'pincode', check: v => v.length === 6},
+    ];
+    required.forEach(r => {
+      const el = document.getElementById(r.id);
+      if (!el) return;
+      if (!r.check(el.value.trim())) {
+        el.classList.add('error');
+        ok = false;
+      } else {
+        el.classList.remove('error');
+      }
+    });
+    return ok;
+  }
+
+  // Place order
+  function placeOrder() {
+    if (!validate()) {
+      const firstErr = document.querySelector('input.error');
+      if (firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    const btn = document.getElementById('place-btn');
+    const txt = document.getElementById('place-text');
+    btn.disabled = true;
+    txt.textContent = '⏳ Processing…';
+    setTimeout(() => {
+      document.getElementById('success-overlay').classList.add('show');
+    }, 1800);
+  }
+
+  // Clear error on input
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', () => el.classList.remove('error'));
+  });
+</script>
+</body>
+</html>

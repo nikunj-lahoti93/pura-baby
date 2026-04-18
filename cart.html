@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your cart — pūra.baby organic baby skincare">
+  <title>Your Cart — pūra.baby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --cream:#FBF7F0;--sage:#6B8F71;--sage-light:#A8C5A0;--sage-dark:#3D5C42;
+      --terra:#C4724A;--terra-light:#E8A882;--forest:#1E3A2F;
+      --warm-white:#FFFDF9;--muted:#8B7355;--border:#E8DDD0;
+      --ff-d:'Cormorant Garamond',serif;--ff-b:'DM Sans',sans-serif;
+    }
+    body{font-family:var(--ff-b);background:var(--cream);color:var(--forest);min-height:100vh;font-size:15px;line-height:1.6}
+    /* NAV */
+    nav{background:rgba(251,247,240,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5vw;position:sticky;top:0;z-index:100}
+    .nav-i{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:var(--ff-d);font-size:1.5rem;font-weight:500;color:var(--forest);text-decoration:none}
+    .logo span{color:var(--sage)}
+    .nav-right{display:flex;align-items:center;gap:1.5rem}
+    .nav-link{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-link:hover{color:var(--forest)}
+    /* PROGRESS BAR */
+    .progress{background:var(--warm-white);border-bottom:1px solid var(--border);padding:1rem 5vw}
+    .progress-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0}
+    .step{display:flex;align-items:center;gap:.6rem;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .step.active{color:var(--forest);font-weight:500}
+    .step.done{color:var(--sage-dark)}
+    .step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;flex-shrink:0;transition:all .2s}
+    .step.active .step-num{border-color:var(--forest);background:var(--forest);color:var(--cream)}
+    .step.done .step-num{border-color:var(--sage);background:var(--sage);color:white}
+    .step-line{width:60px;height:1px;background:var(--border);margin:0 .8rem}
+    .step-line.done{background:var(--sage)}
+    /* LAYOUT */
+    .cart-layout{max-width:1200px;margin:0 auto;padding:3rem 5vw 6rem;display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start}
+    /* CART ITEMS */
+    .cart-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.8rem}
+    .cart-title{font-family:var(--ff-d);font-size:2rem;font-weight:400;color:var(--forest)}
+    .cart-count-lbl{font-size:.8rem;color:var(--muted)}
+    .cart-items{display:flex;flex-direction:column;gap:1px}
+    .cart-item{background:var(--warm-white);border:1px solid var(--border);border-radius:18px;padding:1.4rem;display:grid;grid-template-columns:80px 1fr auto;gap:1.2rem;align-items:center;margin-bottom:.8rem;transition:box-shadow .2s;animation:fadeUp .35s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .cart-item:hover{box-shadow:0 4px 20px rgba(30,58,47,.06)}
+    .item-img{width:80px;height:80px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;flex-shrink:0}
+    .item-img.bg1{background:rgba(168,197,160,.2)}
+    .item-img.bg2{background:rgba(232,168,130,.15)}
+    .item-img.bg3{background:rgba(107,143,113,.15)}
+    .item-details h4{font-family:var(--ff-d);font-size:1.15rem;font-weight:400;color:var(--forest);margin-bottom:.2rem;line-height:1.2}
+    .item-meta{font-size:.75rem;color:var(--muted);margin-bottom:.6rem}
+    .item-meta span{background:rgba(107,143,113,.1);color:var(--sage-dark);padding:.15rem .5rem;border-radius:2rem;margin-right:.3rem}
+    .item-qty{display:flex;align-items:center;gap:.5rem}
+    .qty-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:.9rem;color:var(--forest);transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .qty-btn:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+    .qty-num{width:28px;text-align:center;font-size:.85rem;font-weight:500}
+    .item-remove{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;margin-left:.8rem;transition:color .15s}
+    .item-remove:hover{color:var(--terra)}
+    .item-price-col{text-align:right;flex-shrink:0}
+    .item-price{font-size:1.05rem;font-weight:500;color:var(--forest)}
+    .item-price-orig{font-size:.78rem;color:var(--muted);text-decoration:line-through}
+    .item-saving{font-size:.7rem;color:var(--sage-dark);background:rgba(107,143,113,.1);padding:.15rem .45rem;border-radius:2rem;display:inline-block;margin-top:.25rem}
+    /* UPSELL */
+    .upsell-section{margin-top:1.5rem}
+    .upsell-label{font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+    .upsell-label::before{content:'';width:18px;height:1px;background:var(--muted)}
+    .upsell-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+    .upsell-card{background:var(--warm-white);border:1px solid var(--border);border-radius:14px;padding:.9rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:all .18s}
+    .upsell-card:hover{border-color:var(--sage);transform:translateY(-2px)}
+    .upsell-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+    .upsell-info h5{font-size:.8rem;font-weight:500;color:var(--forest);line-height:1.2;margin-bottom:.15rem}
+    .upsell-info p{font-size:.72rem;color:var(--muted)}
+    .upsell-add{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--forest);color:var(--cream);border:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+    .upsell-add:hover{background:var(--terra);transform:scale(1.1)}
+    /* COUPON */
+    .coupon-box{background:var(--warm-white);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.3rem;margin-top:1.5rem;display:flex;gap:.6rem;align-items:center}
+    .coupon-icon{font-size:1.2rem}
+    .coupon-input{flex:1;border:none;background:transparent;font-family:var(--ff-b);font-size:.85rem;color:var(--forest);outline:none;letter-spacing:.05em}
+    .coupon-input::placeholder{color:var(--muted)}
+    .coupon-btn{background:transparent;border:1.5px solid var(--forest);color:var(--forest);padding:.4rem 1rem;border-radius:2rem;font-family:var(--ff-b);font-size:.78rem;cursor:pointer;transition:all .18s;white-space:nowrap}
+    .coupon-btn:hover{background:var(--forest);color:var(--cream)}
+    .coupon-success{font-size:.75rem;color:var(--sage-dark);display:none;align-items:center;gap:.3rem}
+    /* ORDER SUMMARY */
+    .summary-card{background:var(--warm-white);border:1px solid var(--border);border-radius:20px;padding:1.8rem;position:sticky;top:90px}
+    .summary-title{font-family:var(--ff-d);font-size:1.4rem;font-weight:400;color:var(--forest);margin-bottom:1.4rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+    .summary-rows{display:flex;flex-direction:column;gap:.7rem;margin-bottom:1.2rem}
+    .summary-row{display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
+    .summary-row .lbl{color:var(--muted)}
+    .summary-row .val{color:var(--forest);font-weight:500}
+    .summary-row.saving .val{color:var(--sage-dark)}
+    .summary-row.free .val{color:var(--sage-dark)}
+    .summary-divider{border:none;border-top:1px solid var(--border);margin:.8rem 0}
+    .summary-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.3rem}
+    .summary-total .lbl{font-size:1rem;font-weight:500;color:var(--forest)}
+    .summary-total .val{font-family:var(--ff-d);font-size:1.8rem;font-weight:400;color:var(--forest)}
+    .summary-tax{font-size:.72rem;color:var(--muted);text-align:right;margin-bottom:1.4rem}
+    .btn-checkout{width:100%;background:var(--forest);color:var(--cream);border:none;height:52px;border-radius:2rem;font-family:var(--ff-b);font-size:.95rem;letter-spacing:.04em;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;gap:.5rem;font-weight:500;text-decoration:none;margin-bottom:.8rem}
+    .btn-checkout:hover{background:var(--sage-dark);transform:translateY(-1px)}
+    .btn-continue{width:100%;background:transparent;color:var(--forest);border:1.5px solid var(--border);height:44px;border-radius:2rem;font-family:var(--ff-b);font-size:.85rem;cursor:pointer;transition:all .22s;text-decoration:none;display:flex;align-items:center;justify-content:center}
+    .btn-continue:hover{border-color:var(--forest)}
+    .summary-trust{margin-top:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+    .trust-line{display:flex;align-items:center;gap:.6rem;font-size:.73rem;color:var(--muted)}
+    .trust-line span{font-size:.9rem}
+    /* DELIVERY PROGRESS */
+    .delivery-progress{background:rgba(107,143,113,.07);border:1px solid rgba(107,143,113,.2);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1.4rem}
+    .dp-text{font-size:.78rem;color:var(--sage-dark);margin-bottom:.5rem;font-weight:500}
+    .dp-bar-track{background:rgba(107,143,113,.15);border-radius:3px;height:5px;overflow:hidden}
+    .dp-bar-fill{background:var(--sage);height:100%;border-radius:3px;transition:width .5s ease}
+    .dp-sub{font-size:.7rem;color:var(--muted);margin-top:.35rem}
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:5rem 2rem;display:none}
+    .empty-state.visible{display:block}
+    .empty-icon{font-size:4rem;margin-bottom:1rem;opacity:.4}
+    .empty-state h3{font-family:var(--ff-d);font-size:1.8rem;font-weight:300;color:var(--forest);margin-bottom:.5rem}
+    .empty-state p{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+    /* RESPONSIVE */
+    @media(max-width:800px){
+      .cart-layout{grid-template-columns:1fr;gap:2rem}
+      .summary-card{position:static}
+      .upsell-grid{grid-template-columns:1fr}
+      .step-line{width:30px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-i">
+    <a href="index.html" class="logo">pūra<span>.</span>baby</a>
+    <div class="nav-right">
+      <a href="product.html" class="nav-link">Continue shopping</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress">
+  <div class="progress-inner">
+    <div class="step active">
+      <div class="step-num">1</div>
+      <span>Cart</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <span>Checkout</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <span>Confirmation</span>
+    </div>
+  </div>
+</div>
+
+<div class="cart-layout">
+
+  <!-- LEFT: ITEMS -->
+  <div>
+    <div class="cart-header">
+      <h1 class="cart-title">Your cart</h1>
+      <span class="cart-count-lbl" id="cart-count-lbl">3 items</span>
+    </div>
+
+    <div id="cart-items-list">
+      <!-- Items rendered by JS -->
+    </div>
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet. Start with our bestsellers.</p>
+      <a href="product.html" class="btn-checkout" style="width:auto;display:inline-flex;padding:0 2rem">Browse products</a>
+    </div>
+
+    <!-- UPSELL -->
+    <div class="upsell-section" id="upsell-section">
+      <div class="upsell-label">You might also need</div>
+      <div class="upsell-grid">
+        <div class="upsell-card" onclick="addUpsell(this,'Soothing Massage Oil','₹399','🫙','bg3')">
+          <div class="upsell-icon bg3">🫙</div>
+          <div class="upsell-info">
+            <h5>Soothing Massage Oil</h5>
+            <p>₹ 399</p>
+          </div>
+          <button class="upsell-add">+</button>
+        </div>
+        <div class="upsell-card" onclick="addUpsell(this,'Mineral SPF 50','₹699','☀️','bg2')">
+          <div class="upsell-icon bg2">☀️</div>
+          <div class="upsell-info">
+            <h5>Mineral Sun Shield SPF 50</h5>
+            <p>₹ 699</p>
+          </div>
+          <button class="upsell-add">+</button>
+        </div>
+        <div class="upsell-card" onclick="addUpsell(this,'Nappy Rash Cream','₹349','🌸','bg1')">
+          <div class="upsell-icon bg1">🌸</div>
+          <div class="upsell-info">
+            <h5>Nappy Rash Cream</h5>
+            <p>₹ 349</p>
+          </div>
+          <button class="upsell-add">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUPON -->
+    <div class="coupon-box">
+      <div class="coupon-icon">🏷️</div>
+      <input class="coupon-input" placeholder="Enter coupon code" id="coupon-input">
+      <div class="coupon-success" id="coupon-success">✓ PURA10 applied — saving ₹100</div>
+      <button class="coupon-btn" onclick="applyCoupon()">Apply</button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: SUMMARY -->
+  <div>
+    <div class="summary-card">
+
+      <!-- FREE DELIVERY PROGRESS -->
+      <div class="delivery-progress" id="delivery-progress">
+        <div class="dp-text" id="dp-text">Add ₹52 more for free delivery 🚚</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" id="dp-bar" style="width:94%"></div></div>
+        <div class="dp-sub">Free delivery on orders above ₹499</div>
+      </div>
+
+      <div class="summary-title">Order summary</div>
+
+      <div class="summary-rows">
+        <div class="summary-row"><span class="lbl">Subtotal (3 items)</span><span class="val" id="subtotal-val">₹ 1,247</span></div>
+        <div class="summary-row saving"><span class="lbl">Discount (18%)</span><span class="val" id="discount-val">− ₹ 300</span></div>
+        <div class="summary-row"><span class="lbl">Coupon</span><span class="val" id="coupon-val" style="color:var(--muted)">—</span></div>
+        <div class="summary-row free"><span class="lbl">Delivery</span><span class="val" id="delivery-val">₹ 49</span></div>
+        <div class="summary-row"><span class="lbl">GST (18%)</span><span class="val" id="gst-val">₹ 170</span></div>
+      </div>
+
+      <hr class="summary-divider">
+
+      <div class="summary-total">
+        <span class="lbl">Total</span>
+        <span class="val" id="total-val">₹ 1,166</span>
+      </div>
+      <div class="summary-tax">Inclusive of all taxes</div>
+
+      <a href="checkout.html" class="btn-checkout">
+        Proceed to checkout →
+      </a>
+      <a href="product.html" class="btn-continue">← Continue shopping</a>
+
+      <div class="summary-trust">
+        <div class="trust-line"><span>🔒</span> 100% secure checkout — SSL encrypted</div>
+        <div class="trust-line"><span>↩️</span> 30-day hassle-free returns</div>
+        <div class="trust-line"><span>🚚</span> Delivered in 2–4 business days</div>
+        <div class="trust-line"><span>📞</span> 24/7 customer support</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Cart data
+  let cart = [
+    {id:1, name:'Calendula Gentle Wash', variant:'200ml · Calendula & Oat', icon:'🌼', bg:'bg1', qty:2, price:449, orig:549},
+    {id:2, name:'Moringa Daily Lotion',  variant:'200ml · Original',         icon:'🌱', bg:'bg2', qty:1, price:549, orig:649},
+  ];
+
+  function renderCart() {
+    const list = document.getElementById('cart-items-list');
+    const empty = document.getElementById('empty-state');
+    const upsell = document.getElementById('upsell-section');
+    list.innerHTML = '';
+    if (cart.length === 0) {
+      empty.classList.add('visible');
+      upsell.style.display = 'none';
+      document.getElementById('cart-count-lbl').textContent = '0 items';
+      updateSummary();
+      return;
+    }
+    empty.classList.remove('visible');
+    upsell.style.display = 'block';
+    document.getElementById('cart-count-lbl').textContent = cart.length + ' item' + (cart.length > 1 ? 's' : '');
+    cart.forEach((item, idx) => {
+      const el = document.createElement('div');
+      el.className = 'cart-item';
+      el.style.animationDelay = (idx * 0.07) + 's';
+      el.innerHTML = `
+        <div class="item-img ${item.bg}">${item.icon}</div>
+        <div class="item-details">
+          <h4>${item.name}</h4>
+          <div class="item-meta"><span>${item.variant}</span></div>
+          <div class="item-qty">
+            <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+            <span class="qty-num">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+            <span class="item-remove" onclick="removeItem(${item.id})">Remove</span>
+          </div>
+        </div>
+        <div class="item-price-col">
+          <div class="item-price">₹ ${(item.price * item.qty).toLocaleString('en-IN')}</div>
+          <div class="item-price-orig">₹ ${(item.orig * item.qty).toLocaleString('en-IN')}</div>
+          <div class="item-saving">Save ₹${((item.orig - item.price) * item.qty).toLocaleString('en-IN')}</div>
+        </div>`;
+      list.appendChild(el);
+    });
+    updateSummary();
+  }
+
+  function changeQty(id, delta) {
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+    item.qty = Math.max(1, Math.min(10, item.qty + delta));
+    renderCart();
+  }
+
+  function removeItem(id) {
+    cart = cart.filter(i => i.id !== id);
+    renderCart();
+  }
+
+  let couponApplied = false;
+
+  function applyCoupon() {
+    const val = document.getElementById('coupon-input').value.trim().toUpperCase();
+    const success = document.getElementById('coupon-success');
+    if (val === 'PURA10' || val === 'BABY15') {
+      couponApplied = true;
+      success.style.display = 'flex';
+      document.getElementById('coupon-input').style.display = 'none';
+      updateSummary();
+    } else {
+      document.getElementById('coupon-input').style.border = '1px solid var(--terra)';
+      document.getElementById('coupon-input').placeholder = 'Invalid code — try PURA10';
+      setTimeout(() => {
+        document.getElementById('coupon-input').style.border = '';
+        document.getElementById('coupon-input').placeholder = 'Enter coupon code';
+      }, 2000);
+    }
+  }
+
+  function updateSummary() {
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const origTotal = cart.reduce((s, i) => s + i.orig * i.qty, 0);
+    const discount = origTotal - subtotal;
+    const coupon = couponApplied ? 100 : 0;
+    const delivery = subtotal >= 499 ? 0 : 49;
+    const gst = Math.round(subtotal * 0.18);
+    const total = subtotal - coupon + delivery + gst;
+
+    document.getElementById('subtotal-val').textContent = '₹ ' + subtotal.toLocaleString('en-IN');
+    document.getElementById('discount-val').textContent = '− ₹ ' + discount.toLocaleString('en-IN');
+    document.getElementById('coupon-val').textContent = coupon ? '− ₹ ' + coupon : '—';
+    document.getElementById('coupon-val').style.color = coupon ? 'var(--sage-dark)' : 'var(--muted)';
+    document.getElementById('delivery-val').textContent = delivery === 0 ? 'FREE' : '₹ ' + delivery;
+    document.getElementById('delivery-val').style.color = delivery === 0 ? 'var(--sage-dark)' : 'var(--forest)';
+    document.getElementById('gst-val').textContent = '₹ ' + gst.toLocaleString('en-IN');
+    document.getElementById('total-val').textContent = '₹ ' + total.toLocaleString('en-IN');
+
+    // Free delivery bar
+    const needed = Math.max(0, 499 - subtotal);
+    const pct = Math.min(100, (subtotal / 499) * 100);
+    document.getElementById('dp-bar').style.width = pct + '%';
+    document.getElementById('dp-text').textContent = needed > 0
+      ? `Add ₹${needed} more for free delivery 🚚`
+      : '🎉 You\'ve unlocked free delivery!';
+    document.getElementById('dp-text').style.color = needed === 0 ? 'var(--sage-dark)' : 'var(--sage-dark)';
+  }
+
+  function addUpsell(card, name, priceStr, icon, bg) {
+    const price = parseInt(priceStr.replace('₹','').trim());
+    const existing = cart.find(i => i.name === name);
+    if (existing) { existing.qty++; }
+    else {
+      cart.push({id: Date.now(), name, variant:'100ml · Original', icon, bg, qty:1, price, orig: Math.round(price*1.15)});
+    }
+    card.style.opacity = '.5';
+    card.style.pointerEvents = 'none';
+    card.querySelector('.upsell-add').textContent = '✓';
+    renderCart();
+  }
+
+  renderCart();
+</script>
+</body>
+</html>
